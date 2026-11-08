@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="WeatherNow — A modern weather forecast dashboard powered by Open-Meteo." />
+  <title>WeatherNow | Weather Forecast System</title>
+  <link rel="icon" type="image/svg+xml" href="assets/favicon.svg" />
+  <link rel="apple-touch-icon" href="assets/favicon.svg" />
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet" />
+
+  <link rel="stylesheet" href="css/style.css" />
+
+  <!-- Lucide icons -->
+  <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js" defer></script>
+</head>
+<body>
+  <div class="bg-glow bg-glow--one" aria-hidden="true"></div>
+  <div class="bg-glow bg-glow--two" aria-hidden="true"></div>
+
+  <!-- ============ A. TOP NAVIGATION ============ -->
+  <header class="site-header">
+    <div class="container nav-inner">
+      <a href="#overview" class="brand" aria-label="WeatherNow home">
+        <span class="brand-icon"><img class="brand-logo" src="assets/logo.svg" alt="WeatherNow logo" /></span>
+        <span class="brand-name">Weather<strong>Now</strong></span>
+      </a>
+
+      <nav class="nav-links" id="nav-links" aria-label="Primary">
+        <a href="#overview" class="nav-link is-active">Overview</a>
+        <a href="#forecast" class="nav-link">Forecast</a>
+        <a href="favorites.html" class="nav-link">Favorites <span id="nav-fav-count" class="nav-badge" hidden></span></a>
+        <a href="#about" class="nav-link">About</a>
+      </nav>
+
+      <div class="search-wrap">
+        <form class="search" id="search-form" role="search">
+          <label class="visually-hidden" for="city-input">Search for a city in the Philippines</label>
+          <span class="search-icon" aria-hidden="true"><i data-lucide="search"></i></span>
+          <input id="city-input" type="text" placeholder="Search a Philippine city…" autocomplete="off" role="combobox" aria-expanded="false" aria-controls="autocomplete-list" aria-activedescendant="" />
+          <select id="provider-select" class="provider-select" aria-label="Weather data provider">
+            <option value="openmeteo" selected>Open-Meteo</option>
+            <option value="openweathermap">OpenWeatherMap</option>
+          </select>
+          <button id="search-btn" type="submit" class="btn-search">
+            <span class="btn-search__label">Search</span>
+            <span class="btn-search__spinner" aria-hidden="true"></span>
+          </button>
+        </form>
+        <ul class="autocomplete-list" id="autocomplete-list" role="listbox" aria-label="City suggestions"></ul>
+        <p class="provider-note" id="provider-note">Open-Meteo · no key needed · free</p>
+      </div>
+
+      <button class="menu-toggle" id="menu-toggle" aria-label="Open menu" aria-expanded="false" aria-controls="nav-links">
+        <i data-lucide="menu"></i>
+      </button>
+    </div>
+  </header>
+
+  <main class="container page" id="main-content">
+    <!-- ============ B. MAIN WEATHER OVERVIEW ============ -->
+    <section id="overview" class="hero" aria-label="Current weather overview">
+      <article class="hero-card glass">
+        <div class="hero-main">
+          <div class="hero-info">
+            <p class="hero-location"><i data-lucide="map-pin"></i> <span id="display-city">Butuan City</span>, <span id="display-country">Philippines</span> <button id="favorite-btn" type="button" class="fav-btn" aria-label="Add to favorites" aria-pressed="false" title="Add to favorites"><i data-lucide="star"></i><span class="fav-btn__label">Add to favorites</span></button></p>
+            <div id="favorites-section" class="favorites" hidden>
+              <span class="favorites-label"><i data-lucide="star"></i> Favorites:</span>
+              <span id="favorites-list" class="favorites-list"></span>
+              <a href="favorites.html" class="favorites-link">View all favorites <i data-lucide="arrow-right"></i></a>
+            </div>
+            <p class="hero-date" id="current-date">Loading date…</p>
+            <p class="hero-condition" id="display-condition">Loading…</p>
+            <p class="hero-feels">Feels like <span id="display-feels">—</span></p>
+
+            <div class="hero-temps" aria-label="Today's high and low">
+              <span class="temp-pill"><i data-lucide="arrow-up"></i> H: <span id="display-high">—</span></span>
+              <span class="temp-pill"><i data-lucide="arrow-down"></i> L: <span id="display-low">—</span></span>
+            </div>
+          </div>
+
+          <div class="hero-visual">
+            <div class="hero-illustration" aria-hidden="true">
+              <img class="hero-art-img" src="assets/hero-art.svg" alt="" />
+              <span class="hero-icon" id="display-icon"><i data-lucide="cloud-sun"></i></span>
+            </div>
+            <p class="hero-temp"><span id="display-temp">—</span><span class="hero-temp-unit">°C</span></p>
+            <p class="hero-temp-label">Current temperature</p>
+          </div>
+        </div>
+      </article>
+    </section>
+
+    <!-- ============ C. WEATHER DETAILS ============ -->
+    <section class="details" aria-label="Weather details">
+      <article class="detail-card glass">
+        <div class="detail-icon detail-icon--blue"><img class="detail-asset" src="assets/humidity.svg" alt="Humidity" /></div>
+        <div>
+          <p class="detail-label">Humidity</p>
+          <p class="detail-value" id="detail-humidity">—</p>
+        </div>
+      </article>
+
+      <article class="detail-card glass">
+        <div class="detail-icon detail-icon--sky"><img class="detail-asset" src="assets/wind.svg" alt="Wind speed" /></div>
+        <div>
+          <p class="detail-label">Wind Speed</p>
+          <p class="detail-value" id="detail-wind">—</p>
+        </div>
+      </article>
+
+      <article class="detail-card glass">
+        <div class="detail-icon detail-icon--violet"><img class="detail-asset" src="assets/visibility.svg" alt="Visibility" /></div>
+        <div>
+          <p class="detail-label">Visibility</p>
+          <p class="detail-value" id="detail-visibility">—</p>
+        </div>
+      </article>
+
+      <article class="detail-card glass">
+        <div class="detail-icon detail-icon--cyan"><img class="detail-asset" src="assets/pressure.svg" alt="Pressure" /></div>
+        <div>
+          <p class="detail-label">Pressure</p>
+          <p class="detail-value" id="detail-pressure">—</p>
+        </div>
+      </article>
+    </section>
+
+    <!-- ============ D + E. FORECAST ============ -->
+    <section id="forecast" class="forecast" aria-label="Forecast">
+      <div class="section-head">
+        <h2>Forecast</h2>
+        <p id="provider-label">Live from Open-Meteo</p>
+      </div>
+
+      <article class="panel glass" aria-label="Hourly forecast">
+        <h3 class="panel-title"><i data-lucide="clock"></i> Hourly Forecast</h3>
+        <ul class="hourly-track" id="hourly-track">
+          <li class="hour-item"><span class="hour-time">Loading…</span></li>
+        </ul>
+      </article>
+
+      <article class="panel glass" aria-label="7-day forecast">
+        <h3 class="panel-title"><i data-lucide="calendar-days"></i> 7-Day Forecast</h3>
+        <ul class="daily-list" id="daily-list">
+          <li class="day-item"><span class="day-name">Loading…</span></li>
+        </ul>
+      </article>
+    </section>
+
+    <!-- ============ F. ADDITIONAL + ABOUT ============ -->
+    <section id="about" class="extra" aria-label="Additional weather information and about">
+      <div class="section-head">
+        <h2>Details &amp; About</h2>
+        <p>Sun, moon &amp; UV at a glance</p>
+      </div>
+
+      <div class="extra-grid">
+        <article class="detail-card glass extra-card">
+          <div class="detail-icon detail-icon--amber"><img class="detail-asset" src="assets/sunrise.svg" alt="Sunrise" /></div>
+          <div>
+            <p class="detail-label">Sunrise</p>
+            <p class="detail-value" id="extra-sunrise">—</p>
+          </div>
+        </article>
+
+        <article class="detail-card glass extra-card">
+          <div class="detail-icon detail-icon--orange"><img class="detail-asset" src="assets/sunset.svg" alt="Sunset" /></div>
+          <div>
+            <p class="detail-label">Sunset</p>
+            <p class="detail-value" id="extra-sunset">—</p>
+          </div>
+        </article>
+
+        <article class="detail-card glass extra-card">
+          <div class="detail-icon detail-icon--blue"><img class="detail-asset" src="assets/uv.svg" alt="UV index" /></div>
+          <div>
+            <p class="detail-label">UV Index</p>
+            <p class="detail-value" id="extra-uv">—</p>
+          </div>
+        </article>
+
+        <article class="glass about-card">
+          <h3>About WeatherNow</h3>
+          <p>WeatherNow is a beginner-friendly weather dashboard built with HTML, CSS, Vanilla JavaScript, and Node.js. Default live data is provided free by the Open-Meteo API (Philippine cities supported, no API key needed). You can optionally switch to OpenWeatherMap in the header — weather data © OpenWeather when that provider is selected.</p>
+        </article>
+      </div>
+    </section>
+
+    <footer class="site-footer">
+      <p>WeatherNow · Live data from <span id="footer-provider">Open-Meteo</span> · Built with HTML, CSS &amp; Vanilla JS</p>
+    </footer>
+  </main>
+
+  <!-- Search loading overlay -->
+  <div class="loading-overlay" id="loading-overlay" aria-hidden="true">
+    <div class="loading-box glass">
+      <span class="loader"></span>
+      <p>Loading weather…</p>
+    </div>
+  </div>
+
+  <!-- Toast -->
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+  <script src="js/script.js" defer></script>
+</body>
+</html>
